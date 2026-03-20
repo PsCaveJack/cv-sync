@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "CV Sync version 2",
+  "version": "1.0",
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": ["*://*.indeed.com/*"],
+  "action": {
+    "default_popup": "index.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.indeed.com/*"],
+      "js": ["src/content/index.ts"]
+    }
+  ],
+  "background": {
+    "service_worker": "src/content/index.ts",
+    "type": "module"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' http://localhost:5173; object-src 'self'"
+  },
+  "web_accessible_resources": [
+  {
+    "resources": ["assets/*", "src/content/*"],
+    "matches": ["*://*.indeed.com/*"]
+  }
+]
+}
