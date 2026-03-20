@@ -11,11 +11,26 @@ function App() {
   const [jobData, setJobData] = useState<JobPost | null>(null);
   const [analysis, setAnalysis] = useState<string>("");
 
+  const preprocessDescription = (text: string): string => {
+    // Collapse whitespace and remove blank lines
+    const cleaned = text.replace(/[^\S\n]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+
+    // Prefer sections likely to contain requirements/skills
+    const keywordPattern = /(requirement|qualification|skill|experience|responsibi|you will|what you|we're looking|must have|nice to have)/i;
+    const lines = cleaned.split('\n');
+    const relevant = lines.filter(line => keywordPattern.test(line) || line.startsWith('•') || line.startsWith('-') || /^\d+\./.test(line.trim()));
+
+    const condensed = relevant.length > 10 ? relevant.join('\n') : cleaned;
+
+    // Cap at ~1500 chars to reduce token usage
+    return condensed.slice(0, 1500);
+  };
+
   const AIRequest = async( jobDescription: string | undefined ) => {
-    console.log("Sending request", jobDescription)
-    if (!jobDescription) {
-      return;
-    }
+    if (!jobDescription) return;
+
+    const trimmed = preprocessDescription(jobDescription);
+    console.log("Sending request", trimmed);
     try {
       const response = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
@@ -32,7 +47,7 @@ function App() {
             },
             {
               role: "user",
-              content: jobDescription
+              content: trimmed
             }
           ]
         })
@@ -60,7 +75,7 @@ function App() {
             console.error("Failed:", chrome.runtime.lastError.message);
             return;
           }
-          console.log("Received from LinkedIn:", response);
+          console.log("Received from Indeed:", response);
           setJobData(response);
         }
       );
