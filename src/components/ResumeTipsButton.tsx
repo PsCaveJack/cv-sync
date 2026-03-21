@@ -1,7 +1,7 @@
 import { getResumeTips } from '../lib/openai';
 import { getJobDescription, injectAnalysis } from '../lib/tab';
+import { setConversationId } from '../lib/storage';
 
-const CONVERSATION_ID_KEY = 'cv_sync_conversation_id';
 
 interface ResumeTipsButtonProps {
   conversationId: string;
@@ -14,7 +14,7 @@ export default function ResumeTipsButton({ conversationId, onNewConversationId }
     if (!description) return;
     try {
       const { id, text } = await getResumeTips(conversationId, description);
-      localStorage.setItem(CONVERSATION_ID_KEY, id);
+      await setConversationId(id);
       onNewConversationId(id);
       injectAnalysis(text);
     } catch (error) {
