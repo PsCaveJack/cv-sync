@@ -1,13 +1,13 @@
 import { useRef, useState } from 'react';
 import { extractTextFromPDF } from '../lib/pdf';
 import { startConversation } from '../lib/openai';
-import { getConversationId, setConversationId } from '../lib/storage';
+import { getConversationId, setConversationId, clearConversationId } from '../lib/storage';
 
 interface ResumeUploadProps {
-  onConversationStarted: (id: string) => void;
+  // add as needed
 }
 
-export default function ResumeUpload({ onConversationStarted }: ResumeUploadProps) {
+export default function ResumeUpload() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<'idle' | 'loading' | 'saved'>(() => {
     getConversationId().then((id) => { if (id) setStatus('saved'); });
@@ -23,12 +23,17 @@ export default function ResumeUpload({ onConversationStarted }: ResumeUploadProp
       const text = await extractTextFromPDF(file);
       const { id } = await startConversation(text);
       await setConversationId(id);
-      onConversationStarted(id);
       setStatus('saved');
     } catch (err) {
       console.error("Resume upload error:", err);
       setStatus('idle');
     }
+  };
+
+  const handleDelete = async () => {
+    await clearConversationId();
+    onConversationCleared();
+    setStatus('idle');
   };
 
   return (
@@ -38,7 +43,7 @@ export default function ResumeUpload({ onConversationStarted }: ResumeUploadProp
         type="file"
         accept="application/pdf"
         onChange={handleFile}
-        className="hidden"
+        style={{ display: 'none' }}
       />
       <button
         onClick={() => inputRef.current?.click()}
@@ -47,6 +52,14 @@ export default function ResumeUpload({ onConversationStarted }: ResumeUploadProp
       >
         {status === 'loading' ? 'Saving resume...' : status === 'saved' ? 'Resume saved ✓' : 'Upload Resume (PDF)'}
       </button>
+      {status === 'saved' && (
+        <button
+          onClick={handleDelete}
+          className="w-full px-4 py-2 rounded border border-red-500 text-red-500 text-sm hover:bg-red-50 mt-1"
+        >
+          Remove Resume
+        </button>
+      )}
     </div>
   );
 }

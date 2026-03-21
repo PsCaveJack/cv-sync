@@ -13,9 +13,9 @@ function injectResumeTipsButton(container: Element) {
   btn.style.cssText = 'margin-top:8px;padding:8px 16px;background:#16a34a;color:#fff;border:none;border-radius:4px;font-size:14px;cursor:pointer;width:100%;';
 
   btn.addEventListener('click', async () => {
-    const conversationId = await getConversationId();
+    let conversationId = await getConversationId();
     if (!conversationId) {
-      btn.textContent = 'Upload resume in the extension first';
+      chrome.runtime.sendMessage({ action: "OPEN_POPUP" });
       return;
     }
 
