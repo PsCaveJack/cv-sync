@@ -1,8 +1,7 @@
 import { useRef, useState } from 'react';
 import { extractTextFromPDF } from '../lib/pdf';
 import { startConversation } from '../lib/openai';
-
-const CONVERSATION_ID_KEY = 'cv_sync_conversation_id';
+import { getConversationId, setConversationId } from '../lib/storage';
 
 interface ResumeUploadProps {
   onConversationStarted: (id: string) => void;
@@ -10,9 +9,10 @@ interface ResumeUploadProps {
 
 export default function ResumeUpload({ onConversationStarted }: ResumeUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [status, setStatus] = useState<'idle' | 'loading' | 'saved'>(() =>
-    localStorage.getItem(CONVERSATION_ID_KEY) ? 'saved' : 'idle'
-  );
+  const [status, setStatus] = useState<'idle' | 'loading' | 'saved'>(() => {
+    getConversationId().then((id) => { if (id) setStatus('saved'); });
+    return 'idle';
+  });
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -22,7 +22,7 @@ export default function ResumeUpload({ onConversationStarted }: ResumeUploadProp
     try {
       const text = await extractTextFromPDF(file);
       const { id } = await startConversation(text);
-      localStorage.setItem(CONVERSATION_ID_KEY, id);
+      await setConversationId(id);
       onConversationStarted(id);
       setStatus('saved');
     } catch (err) {
