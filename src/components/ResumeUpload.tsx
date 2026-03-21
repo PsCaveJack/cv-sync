@@ -1,23 +1,33 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { extractTextFromPDF } from '../lib/pdf';
+import { startConversation } from '../lib/openai';
+
+const CONVERSATION_ID_KEY = 'cv_sync_conversation_id';
 
 interface ResumeUploadProps {
-  resumeText: string;
-  onResumeLoaded: (text: string) => void;
+  onConversationStarted: (id: string) => void;
 }
 
-export default function ResumeUpload({ resumeText, onResumeLoaded }: ResumeUploadProps) {
+export default function ResumeUpload({ onConversationStarted }: ResumeUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [status, setStatus] = useState<'idle' | 'loading' | 'saved'>(() =>
+    localStorage.getItem(CONVERSATION_ID_KEY) ? 'saved' : 'idle'
+  );
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || file.type !== 'application/pdf') return;
 
+    setStatus('loading');
     try {
       const text = await extractTextFromPDF(file);
-      onResumeLoaded(text);
+      const { id } = await startConversation(text);
+      localStorage.setItem(CONVERSATION_ID_KEY, id);
+      onConversationStarted(id);
+      setStatus('saved');
     } catch (err) {
-      console.error("PDF parse error:", err);
+      console.error("Resume upload error:", err);
+      setStatus('idle');
     }
   };
 
@@ -32,9 +42,10 @@ export default function ResumeUpload({ resumeText, onResumeLoaded }: ResumeUploa
       />
       <button
         onClick={() => inputRef.current?.click()}
-        className="w-full px-4 py-2 rounded border border-blue-600 text-blue-600 text-sm hover:bg-blue-50"
+        disabled={status === 'loading'}
+        className="w-full px-4 py-2 rounded border border-blue-600 text-blue-600 text-sm hover:bg-blue-50 disabled:opacity-50"
       >
-        {resumeText ? 'Resume loaded ✓' : 'Upload Resume (PDF)'}
+        {status === 'loading' ? 'Saving resume...' : status === 'saved' ? 'Resume saved ✓' : 'Upload Resume (PDF)'}
       </button>
     </div>
   );
