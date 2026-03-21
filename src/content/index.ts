@@ -1,5 +1,8 @@
+import { createRoot } from 'react-dom/client';
+import { createElement } from 'react';
 import { getResumeTips } from '../lib/openai';
 import { getConversationId, setConversationId } from '../lib/storage';
+import TipsAccordion from '../components/TipsAccordion';
 
 function injectResumeTipsButton(container: Element) {
   if (document.getElementById('cv-sync-tips-btn')) return;
@@ -29,9 +32,8 @@ function injectResumeTipsButton(container: Element) {
       document.getElementById('cv-sync-analysis')?.remove();
       const box = document.createElement('div');
       box.id = 'cv-sync-analysis';
-      box.style.cssText = 'margin:8px 0;padding:10px 12px;background:#f0f4ff;border-left:3px solid #4f6ef7;border-radius:4px;font-size:13px;white-space:pre-wrap;line-height:1.5;color:#1a1a1a;';
-      box.textContent = text;
       container.insertAdjacentElement('afterend', box);
+      createRoot(box).render(createElement(TipsAccordion, { text }));
 
       btn.textContent = 'Get Resume Tips';
     } catch (err) {
