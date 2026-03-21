@@ -57,6 +57,23 @@ export async function sendFollowUp(previousResponseId: string, jobDescription: s
   return { id: data.id, text: data.output[0].content[0].text };
 }
 
+// Uses an existing conversation (with resume context) to get 3 tailored resume tips for the job.
+export async function getResumeTips(conversationId: string, jobDescription: string): Promise<{ id: string; text: string }> {
+  const trimmed = preprocessDescription(jobDescription);
+  const response = await fetch("https://api.openai.com/v1/responses", {
+    method: "POST",
+    headers: HEADERS,
+    body: JSON.stringify({
+      model: MODEL,
+      previous_response_id: conversationId,
+      input: `Here is a job description I'm applying to:\n\n${trimmed}\n\nBased on my resume, give me exactly 3 specific tips to tailor my resume for this role.`
+    })
+  });
+
+  const data = await response.json();
+  return { id: data.id, text: data.output[0].content[0].text };
+}
+
 function buildSystemPrompt(resumeText?: string): string {
   const base = "You are a career coach. Analyze the following job description. Identify the top 3 technical skills required and give a 1-sentence summary of the role.";
   if (!resumeText) return base;
