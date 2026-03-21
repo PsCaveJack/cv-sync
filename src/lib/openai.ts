@@ -41,14 +41,15 @@ export async function startConversation(resumeText?: string): Promise<{ id: stri
 
 // Continues an existing conversation using the id returned by startConversation or a prior sendFollowUp.
 // Returns { id, text } — update your stored id with the new one for the next turn.
-export async function sendFollowUp(previousResponseId: string, message: string): Promise<{ id: string; text: string }> {
+export async function sendFollowUp(previousResponseId: string, jobDescription: string): Promise<{ id: string; text: string }> {
+  const trimmed = preprocessDescription(jobDescription);
   const response = await fetch("https://api.openai.com/v1/responses", {
     method: "POST",
     headers: HEADERS,
     body: JSON.stringify({
       model: MODEL,
       previous_response_id: previousResponseId,
-      input: message
+      input: trimmed
     })
   });
 
