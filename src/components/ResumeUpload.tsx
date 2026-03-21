@@ -3,9 +3,6 @@ import { extractTextFromPDF } from '../lib/pdf';
 import { startConversation } from '../lib/openai';
 import { getConversationId, setConversationId, clearConversationId } from '../lib/storage';
 
-interface ResumeUploadProps {
-  // add as needed
-}
 
 export default function ResumeUpload() {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -32,7 +29,6 @@ export default function ResumeUpload() {
 
   const handleDelete = async () => {
     await clearConversationId();
-    onConversationCleared();
     setStatus('idle');
   };
 
