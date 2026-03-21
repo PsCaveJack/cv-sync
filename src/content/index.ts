@@ -20,5 +20,26 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
     });
   }
 
+  if (request.action === "INJECT_ANALYSIS") {
+    const { text } = request;
+
+    document.getElementById('cv-sync-analysis')?.remove();
+
+    const titleEl = document.getElementById('jobsearch-ViewJobButtons-container');
+
+    if (!titleEl) {
+      sendResponse({ ok: false });
+      return true;
+    }
+
+    const box = document.createElement('div');
+    box.id = 'cv-sync-analysis';
+    box.style.cssText = 'margin:8px;padding:10px 12px;background:#f0f4ff;border-left:3px solid #4f6ef7;border-radius:4px;font-size:13px;white-space:pre-wrap;line-height:1.5;color:#1a1a1a;';
+    box.textContent = text;
+
+    titleEl.insertAdjacentElement('afterend', box);
+    sendResponse({ ok: true });
+  }
+
   return true;
 });
