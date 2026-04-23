@@ -18,25 +18,18 @@ const HEADERS = {
   "Authorization": `Bearer ${import.meta.env.VITE_OPENAI_SECRET_KEY}`
 };
 
+const API_BASE = "https://cv-sync-api.vercel.app";
+
 // Uses the Responses API which stores conversation state server-side.
 // Returns { id, text } — save the id to continue the conversation.
 export async function startConversation(resumeText?: string): Promise<{ id: string; text: string }> {
-  const instructions = resumeText
-    ? `You are a career coach helping a candidate with job applications. The candidate's resume is below — use it as context for all responses.\n\nRESUME:\n${resumeText.slice(0, 3000)}`
-    : "You are a career coach helping a candidate with job applications.";
-
-  const response = await fetch("https://api.openai.com/v1/responses", {
+  const response = await fetch(`${API_BASE}/api/start-conversation`, {
     method: "POST",
-    headers: HEADERS,
-    body: JSON.stringify({
-      model: MODEL,
-      instructions,
-      input: "I've shared my resume. I'm ready to discuss job applications."
-    })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ resumeText })
   });
 
-  const data = await response.json();
-  return { id: data.id, text: data.output[0].content[0].text };
+  return response.json();
 }
 
 // Continues an existing conversation using the id returned by startConversation or a prior sendFollowUp.
