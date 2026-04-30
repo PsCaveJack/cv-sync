@@ -11,13 +11,6 @@ function preprocessDescription(text: string): string {
   return condensed.slice(0, 1500);
 }
 
-const MODEL = "gpt-5.2";
-
-const HEADERS = {
-  "Content-Type": "application/json",
-  "Authorization": `Bearer ${import.meta.env.VITE_OPENAI_SECRET_KEY}`
-};
-
 const API_BASE = "https://cv-sync-api.vercel.app";
 
 // Uses the Responses API which stores conversation state server-side.
@@ -58,30 +51,4 @@ export async function getResumeTips(previousResponseId: string, jobDescription: 
   });
 
   return response.json();
-}
-
-function buildSystemPrompt(resumeText?: string): string {
-  const base = "You are a career coach. Analyze the following job description. Identify the top 3 technical skills required and give a 1-sentence summary of the role.";
-  if (!resumeText) return base;
-  return `${base}\n\nThe candidate's resume is provided below for reference. Use it to personalize your advice and highlight gaps or strengths relative to the job.\n\nRESUME:\n${resumeText.slice(0, 3000)}`;
-}
-
-export async function analyzeJobDescription(jobDescription: string, resumeText?: string): Promise<string> {
-  const trimmed = preprocessDescription(jobDescription);
-  console.log("Sending request", trimmed);
-
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: HEADERS,
-    body: JSON.stringify({
-      model: MODEL,
-      messages: [
-        { role: "system", content: buildSystemPrompt(resumeText) },
-        { role: "user", content: trimmed }
-      ]
-    })
-  });
-
-  const data = await response.json();
-  return data.choices[0].message.content;
 }
