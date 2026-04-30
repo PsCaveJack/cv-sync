@@ -3,7 +3,7 @@ import { getResumeTips } from '../lib/openai';
 import { getConversationId, setConversationId } from '../lib/storage';
 import TipsAccordion from './TipsAccordion';
 
-export default function InjectableTipsButton() {
+export default function InjectableTipsButton({ descriptionSelector }: { descriptionSelector: string }) {
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [tips, setTips] = useState<string>("");
 
@@ -14,7 +14,7 @@ export default function InjectableTipsButton() {
       return;
     }
 
-    const description = (document.querySelector('#jobDescriptionText') as HTMLElement)?.innerText?.trim();
+    const description = (document.querySelector(descriptionSelector) as HTMLElement)?.innerText?.trim();
     if (!description) return;
 
     setStatus('loading');

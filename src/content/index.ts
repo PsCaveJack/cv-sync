@@ -2,21 +2,47 @@ import { createRoot } from 'react-dom/client';
 import { createElement } from 'react';
 import InjectableTipsButton from '../components/InjectableTipsButton';
 
+const PLATFORMS = {
+  indeed: {
+    applyContainers: ['#jobsearch-ViewJobButtons-container'],
+    descriptions: ['#jobDescriptionText'],
+    navParam: 'vjk',
+  },
+  linkedin: {
+    applyContainers: [
+      '.job-details-jobs-unified-top-card__container--two-pane',
+    ],
+    descriptions: ['#job-details', '[data-testid="expandable-text-box"]'],
+    navParam: 'currentJobId',
+  },
+} as const;
+
+type Platform = keyof typeof PLATFORMS;
+
+function detectPlatform(): Platform | null {
+  if (location.hostname.includes('indeed.com')) return 'indeed';
+  if (location.hostname.includes('linkedin.com')) return 'linkedin';
+  return null;
+}
+
+const platform = detectPlatform();
+const config = platform ? PLATFORMS[platform] : null;
+
 function injectResumeTipsButton(container: Element) {
-  if (document.getElementById('cv-sync-tips-btn')) return;
+  if (!config || document.getElementById('cv-sync-tips-btn')) return;
 
   const root = document.createElement('div');
   root.id = 'cv-sync-tips-btn';
-  
+  root.style.cssText = 'position:relative;z-index:9999;';
   container.insertAdjacentElement('afterend', root);
-  createRoot(root).render(createElement(InjectableTipsButton));
+  const descriptionSelector = config.descriptions.find(s => document.querySelector(s)) ?? config.descriptions[0];
+  createRoot(root).render(createElement(InjectableTipsButton, { descriptionSelector }));
 }
 
 function notifyJobDetected(container: Element) {
   injectResumeTipsButton(container);
 }
 
-const TARGET = '#jobsearch-ViewJobButtons-container';
 let domObserver: MutationObserver | null = null;
 
 function cleanup() {
@@ -25,15 +51,33 @@ function cleanup() {
   domObserver = null;
 }
 
+function findApplyContainer(): Element | null {
+  if (!config) return null;
+  for (const selector of config.applyContainers) {
+    const el = document.querySelector(selector);
+    if (el) return el;
+  }
+  if (platform === 'linkedin') {
+    const applyLink = document.querySelector(
+      'a[aria-label="Apply on company website"], a[aria-label="Easy Apply to this job"]'
+    );
+    if (applyLink?.parentElement?.parentElement?.parentElement?.parentElement) 
+      return applyLink.parentElement.parentElement.parentElement.parentElement;
+  }
+  return null;
+}
+
 function watchForJobPage() {
-  const existing = document.querySelector(TARGET);
+  if (!config) return;
+
+  const existing = findApplyContainer();
   if (existing) {
     notifyJobDetected(existing);
     return;
   }
 
   domObserver = new MutationObserver(() => {
-    const el = document.querySelector(TARGET);
+    const el = findApplyContainer();
     if (el) {
       domObserver?.disconnect();
       domObserver = null;
@@ -51,15 +95,17 @@ function handleNavigation() {
 
 watchForJobPage();
 
-// Poll for vjk param changes — Indeed updates this on every job navigation
-let lastVjk = new URLSearchParams(location.search).get('vjk');
-setInterval(() => {
-  const vjk = new URLSearchParams(location.search).get('vjk');
-  if (vjk !== lastVjk) {
-    lastVjk = vjk;
-    handleNavigation();
-  }
-}, 500);
+// Poll for job ID param changes — Indeed uses 'vjk', LinkedIn uses 'currentJobId'
+if (config) {
+  let lastJobId = new URLSearchParams(location.search).get(config.navParam);
+  setInterval(() => {
+    const jobId = new URLSearchParams(location.search).get(config.navParam);
+    if (jobId !== lastJobId) {
+      lastJobId = jobId;
+      handleNavigation();
+    }
+  }, 500);
+}
 
 chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
   if (request.action === "GET_JOB_TEXT") {
