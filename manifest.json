@@ -3,7 +3,7 @@
   "name": "CV Sync version 2",
   "version": "1.0",
   "permissions": ["activeTab", "scripting", "storage"],
-  "host_permissions": ["*://*.indeed.com/*", "https://api.openai.com/*"],
+  "host_permissions": ["*://*.indeed.com/*", "https://api.openai.com/*", "https://cv-sync-api.vercel.app/*"],
   "action": {
     "default_popup": "index.html"
   },
