@@ -3,13 +3,13 @@
   "name": "CV Sync version 2",
   "version": "1.0",
   "permissions": ["activeTab", "scripting", "storage"],
-  "host_permissions": ["*://*.indeed.com/*", "https://api.openai.com/*", "https://cv-sync-api.vercel.app/*"],
+  "host_permissions": ["*://*.indeed.com/*", "*://*.linkedin.com/*", "https://api.openai.com/*", "https://cv-sync-api.vercel.app/*"],
   "action": {
     "default_popup": "index.html"
   },
   "content_scripts": [
     {
-      "matches": ["*://*.indeed.com/*"],
+      "matches": ["*://*.indeed.com/*", "*://*.linkedin.com/*"],
       "js": ["src/content/index.ts"]
     }
   ],
@@ -23,7 +23,7 @@
   "web_accessible_resources": [
   {
     "resources": ["assets/*", "src/content/*"],
-    "matches": ["*://*.indeed.com/*"]
+    "matches": ["*://*.indeed.com/*", "*://*.linkedin.com/*"]
   }
 ]
 }
