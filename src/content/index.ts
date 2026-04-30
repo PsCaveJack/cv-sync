@@ -1,50 +1,15 @@
 import { createRoot } from 'react-dom/client';
 import { createElement } from 'react';
-import { getResumeTips } from '../lib/openai';
-import { getConversationId, setConversationId } from '../lib/storage';
-import TipsAccordion from '../components/TipsAccordion';
+import InjectableTipsButton from '../components/InjectableTipsButton';
 
 function injectResumeTipsButton(container: Element) {
   if (document.getElementById('cv-sync-tips-btn')) return;
 
-  const btn = document.createElement('button');
-  btn.id = 'cv-sync-tips-btn';
-  btn.textContent = 'Get Resume Tips';
-  btn.style.cssText = 'margin-top:8px;padding:8px 16px;background:#16a34a;color:#fff;border:none;border-radius:4px;font-size:14px;cursor:pointer;width:100%;';
-
-  btn.addEventListener('click', async () => {
-    let conversationId = await getConversationId();
-    if (!conversationId) {
-      chrome.runtime.sendMessage({ action: "OPEN_POPUP" });
-      return;
-    }
-
-    const description = (document.querySelector('#jobDescriptionText') as HTMLElement)?.innerText?.trim();
-    if (!description) return;
-
-    btn.textContent = 'Analyzing...';
-    btn.disabled = true;
-
-    try {
-      const { id, text } = await getResumeTips(conversationId, description);
-      await setConversationId(id);
-
-      document.getElementById('cv-sync-analysis')?.remove();
-      const box = document.createElement('div');
-      box.id = 'cv-sync-analysis';
-      container.insertAdjacentElement('afterend', box);
-      createRoot(box).render(createElement(TipsAccordion, { text }));
-
-      btn.textContent = 'Get Resume Tips';
-    } catch (err) {
-      console.error('Resume tips error:', err);
-      btn.textContent = 'Failed — try again';
-    }
-
-    btn.disabled = false;
-  });
-
-  container.insertAdjacentElement('afterend', btn);
+  const root = document.createElement('div');
+  root.id = 'cv-sync-tips-btn';
+  
+  container.insertAdjacentElement('afterend', root);
+  createRoot(root).render(createElement(InjectableTipsButton));
 }
 
 function notifyJobDetected(container: Element) {
@@ -56,7 +21,6 @@ let domObserver: MutationObserver | null = null;
 
 function cleanup() {
   document.getElementById('cv-sync-tips-btn')?.remove();
-  document.getElementById('cv-sync-analysis')?.remove();
   domObserver?.disconnect();
   domObserver = null;
 }
