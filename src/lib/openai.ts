@@ -35,36 +35,29 @@ export async function startConversation(resumeText?: string): Promise<{ id: stri
 // Continues an existing conversation using the id returned by startConversation or a prior sendFollowUp.
 // Returns { id, text } — update your stored id with the new one for the next turn.
 export async function sendFollowUp(previousResponseId: string, jobDescription: string): Promise<{ id: string; text: string }> {
-  const trimmed = preprocessDescription(jobDescription);
-  const response = await fetch("https://api.openai.com/v1/responses", {
+  const trimmedText = preprocessDescription(jobDescription)
+  
+  const response = await fetch(`${API_BASE}/api/follow-up`, {
     method: "POST",
-    headers: HEADERS,
-    body: JSON.stringify({
-      model: MODEL,
-      previous_response_id: previousResponseId,
-      input: trimmed
-    })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ previousResponseId, trimmedText })
   });
 
-  const data = await response.json();
-  return { id: data.id, text: data.output[0].content[0].text };
+  return response.json();
 }
 
 // Uses an existing conversation (with resume context) to get 3 tailored resume tips for the job.
-export async function getResumeTips(conversationId: string, jobDescription: string): Promise<{ id: string; text: string }> {
-  const trimmed = preprocessDescription(jobDescription);
-  const response = await fetch("https://api.openai.com/v1/responses", {
+export async function getResumeTips(previousResponseId: string, jobDescription: string): Promise<{ id: string; text: string }> {
+  const trimmedText = preprocessDescription(jobDescription)
+  
+  const response = await fetch(`${API_BASE}/api/get-tips`, {
     method: "POST",
-    headers: HEADERS,
-    body: JSON.stringify({
-      model: MODEL,
-      previous_response_id: conversationId,
-      input: `Here is a job description I'm applying to:\n\n${trimmed}\n\nBased on my resume, give me exactly 3 specific tips to tailor my resume for this role.`
-    })
+    headers: { "Content-Type": "application/json" },
+    credentials: 'same-origin',
+    body: JSON.stringify({ previousResponseId, trimmedText })
   });
 
-  const data = await response.json();
-  return { id: data.id, text: data.output[0].content[0].text };
+  return response.json();
 }
 
 function buildSystemPrompt(resumeText?: string): string {
