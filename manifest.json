@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "CV Sync version 2",
+  "name": "CV Sync",
   "version": "1.0",
   "permissions": ["activeTab", "scripting", "storage"],
   "host_permissions": ["*://*.indeed.com/*", "*://*.linkedin.com/*", "https://api.openai.com/*", "https://cv-sync-api.vercel.app/*"],
