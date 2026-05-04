@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "CV Sync",
   "version": "1.0",
-  "permissions": ["activeTab", "scripting", "storage"],
+  "permissions": ["storage"],
   "host_permissions": ["*://*.indeed.com/*", "*://*.linkedin.com/*", "https://cv-sync-api.vercel.app/*"],
   "icons": {
     "16": "icons/favicon-16x16.png",
