@@ -48,6 +48,9 @@ export default function ResumeUpload() {
       >
         {status === 'loading' ? 'Saving resume...' : status === 'saved' ? 'Resume saved ✓' : 'Upload Resume (PDF)'}
       </button>
+      {status === 'loading' && (
+        <p className="text-xs text-gray-500 mt-2 text-center">Keep this open while your resume is being saved...</p>
+      )}
       {status === 'saved' && (
         <button
           onClick={handleDelete}
