@@ -14,7 +14,7 @@ const PLATFORMS = {
     applyContainers: [
       '.job-details-jobs-unified-top-card__container--two-pane',
     ],
-    descriptions: ['#job-details', '[data-testid="expandable-text-box"]'],
+    descriptions: ['[data-testid="expandable-text-box"]'],
     navParam: 'currentJobId',
   },
 } as const;
@@ -35,6 +35,7 @@ function injectResumeTipsButton(container: Element) {
 
   const root = document.createElement('div');
   root.id = 'cv-sync-tips-btn';
+  root.style.cssText = 'position:relative;z-index:9999;pointer-events:auto;';
   container.insertAdjacentElement('afterend', root);
   const descriptionSelector = config.descriptions.find(s => document.querySelector(s)) ?? config.descriptions[0];
   createRoot(root).render(createElement(InjectableTipsButton, { descriptionSelector }));
