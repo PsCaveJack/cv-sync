@@ -14,7 +14,7 @@ const PLATFORMS = {
     applyContainers: [
       '.job-details-jobs-unified-top-card__container--two-pane',
     ],
-    descriptions: ['[data-testid="expandable-text-box"]'],
+    descriptions: ['[data-testid="expandable-text-box"]', '#job-details'],
     navParam: 'currentJobId',
   },
 } as const;
