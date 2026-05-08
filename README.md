@@ -1,61 +1,90 @@
-# CV Sync Alpha
+# CV Sync
 
-This application is currently capable of reading Indeed job postings and communicating with OpenAI via their API. Setting up the project was a bit more difficult than expected, but it's stable now.
+## What is CV Sync?
 
-Unfortunately, I was not able to have finish a feature-complete alpha by my deadline (2-15-2026),  but I've made significant progress since the start of my sprint.
+CV Sync is a Chrome extension that analyzes job postings on **Indeed** and **LinkedIn** and gives you 3 personalized tips on how to tailor your resume to fit the role — powered by AI.
 
-## Completed Tickets
-- Create Basic Extension Project
-- Grab Indeed Descriptions from Posts
-- Connect to OpenAI's API Platform
+---
 
-## Incomplete Tickets
-- Resume Submission (PDF)
-- Basic AI Analysis for Resume
+## Installation
 
-## Tech Stack
-- **Frontend**: React 18, Tailwind CSS
-- **Build Tool**: Vite + CRXJS
-- **Language**: TypeScript
-- **AI**: OpenAI GPT-4o
-- **Research Focus**: Software measurement tool identification.
+1. Install CV Sync from the Chrome Web Store.
+2. Pin it to your toolbar by clicking the puzzle icon (🧩) in Chrome and pinning CV Sync.
 
-## Instructions to Install and Run the Browser Extension
+---
 
-### 1. Extract the Project from the ZIP folder
+## Setting Up Your Resume
 
-### 2. Build the Extension
-- Open the terminal and navigate to the project 
+Before using CV Sync on a job page, you need to upload your resume once.
 
-- Run the following command to install the necessary dependencies: `npm install`
+1. Click the **CV Sync icon** in your Chrome toolbar to open the popup.
+2. Click **Upload Resume (PDF)** and select your resume file.
+3. Keep the popup open while it saves — you will see *"Keep this open while your resume is being saved..."*
+4. Once saved, the button will change to **Resume saved ✓**.
 
-- Once installation is complete, run the build command: `npm run dev`
+> Your resume is processed securely and used only to personalize your tips. It is not stored after the session is created.
 
-- Result: A new folder named dist/ will appear in your project directory. This folder contains the final, compiled extension. This will be running the extension on a local server and adapts to any changes made by the developer (no relaunches required).
+---
 
-### 3. Load the Extension into Google Chrome
-- Open the Google Chrome browser
+## Getting Resume Tips on a Job Page
 
-- Go to chrome://extensions/
+### Indeed
 
-- In the top-right corner, toggle the Developer mode to ON
+1. Go to [indeed.com](https://indeed.com) and open any job listing.
+2. A green **Get Resume Tips** button will appear below the Apply button.
+3. Click it — CV Sync will analyze the job description against your resume.
+4. 3 personalized tips will appear as expandable cards below the button.
 
-- Click the "Load unpacked" button
+### LinkedIn
 
-- In the file selection dialog, navigate to your project folder and select the dist folder
+1. Go to [linkedin.com/jobs](https://linkedin.com/jobs) and open any job listing.
+2. A green **Get Resume Tips** button will appear below the top card.
+3. Click it — CV Sync will analyze the job description against your resume.
+4. 3 personalized tips will appear as expandable cards below the button.
 
-### 4. OpenAI API Key
-- For the sake of simplicity, I've included the env file with a restricted OpenAI key
+> **Note:** If you navigate to a different job, the button will automatically reappear for the new listing.
 
-### 5. Run the Application
-- Navigate to Indeed.com.
+---
 
-- Search for a job and click on a posting so the details are displayed in the side panel
+## Reading Your Tips
 
-- Open CV Sync from the "Extensions" button in the top right
+Each tip is shown as a collapsible card. Click a card to expand it and read the full suggestion.
 
-- Click "Extract Job Info"
+Tips are specific to both your resume and the job you are viewing — they will differ between roles.
 
-- Result: The extension will scrape the data and provide an AI-generated summary of technical requirements.
+---
 
-Note: This result isn't clean, but my goal this week was to get as many features in the process going. I'll be dedicating future tasks in next week's sprint to restructuring and cleaning up this code.
+## No Resume Uploaded?
+
+If you click **Get Resume Tips** without a resume uploaded, the extension popup will open automatically so you can upload one.
+
+---
+
+## Removing Your Resume
+
+1. Open the CV Sync popup.
+2. Click **Remove Resume**.
+3. Your resume context will be cleared. You can upload a new one at any time.
+
+---
+
+## Supported Job Sites
+
+| Site | Supported |
+|------|-----------|
+| Indeed | ✓ |
+| LinkedIn | ✓ |
+
+---
+
+## Troubleshooting
+
+**The "Get Resume Tips" button is not appearing.**
+- Make sure you are on a job listing page (not a search results page).
+- Try refreshing the page.
+
+**Tips say "Failed — try again."**
+- Check your internet connection and click the button again.
+
+**Resume upload is stuck on "Saving resume..."**
+- Keep the popup open until it completes. Closing it cancels the upload.
