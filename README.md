@@ -8,8 +8,16 @@ CV Sync is a Chrome extension that analyzes job postings on **Indeed** and **Lin
 
 ## Installation
 
+### Option 1 — Chrome Web Store
 1. Install CV Sync from the Chrome Web Store.
 2. Pin it to your toolbar by clicking the puzzle icon (🧩) in Chrome and pinning CV Sync.
+
+### Option 2 — Manual install from `dist` folder
+1. Download or clone this repository and run `npm run build` to generate the `dist/` folder.
+2. Open Chrome and go to `chrome://extensions`.
+3. Enable **Developer mode** (toggle in the top right).
+4. Click **Load unpacked** and select the `dist/` folder.
+5. Pin CV Sync to your toolbar by clicking the puzzle icon (🧩) and pinning it.
 
 ---
 
